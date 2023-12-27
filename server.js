@@ -44,46 +44,51 @@ io.on('connection', (socket) => {
     // Emit sphere rotation value every second
     const intervalId = setInterval(() => {
     
-        // et = et_now();
-        // et += spice.spd()/1200;
-        et = et_now() + et_offset;
+        try {
+            // et = et_now();
+            // et += spice.spd()/1200;
+            et = et_now() + et_offset;
 
-        // positions
-        sunPos = spice.spkpos('sun', et, ref, abcorr, obs).ptarg;
-        earthPos = spice.spkpos('earth', et, ref, abcorr, obs).ptarg;
-        moonPos = spice.spkpos('moon', et, ref, abcorr, obs).ptarg;
+            // positions
+            sunPos = spice.spkpos('sun', et, ref, abcorr, obs).ptarg;
+            earthPos = spice.spkpos('earth', et, ref, abcorr, obs).ptarg;
+            moonPos = spice.spkpos('moon', et, ref, abcorr, obs).ptarg;
 
-        sunPos = spice.mxv(sceneRotation, sunPos);
-        earthPos = spice.mxv(sceneRotation, earthPos);
-        moonPos = spice.mxv(sceneRotation, moonPos);
+            sunPos = spice.mxv(sceneRotation, sunPos);
+            earthPos = spice.mxv(sceneRotation, earthPos);
+            moonPos = spice.mxv(sceneRotation, moonPos);
 
-        const sunPosition = {'x': sunPos[0] / scaleDivisor, 'y': sunPos[1] / scaleDivisor, 'z' : sunPos[2] / scaleDivisor };
-        const earthPosition = {'x': earthPos[0] / scaleDivisor, 'y': earthPos[1] / scaleDivisor, 'z' : earthPos[2] / scaleDivisor };
-        const moonPosition = {'x': moonPos[0] / scaleDivisor, 'y': moonPos[1] / scaleDivisor, 'z' : moonPos[2] / scaleDivisor };
+            const sunPosition = {'x': sunPos[0] / scaleDivisor, 'y': sunPos[1] / scaleDivisor, 'z' : sunPos[2] / scaleDivisor };
+            const earthPosition = {'x': earthPos[0] / scaleDivisor, 'y': earthPos[1] / scaleDivisor, 'z' : earthPos[2] / scaleDivisor };
+            const moonPosition = {'x': moonPos[0] / scaleDivisor, 'y': moonPos[1] / scaleDivisor, 'z' : moonPos[2] / scaleDivisor };
 
-        socket.emit('sunPosition', sunPosition);
-        socket.emit('earthPosition', earthPosition);
-        socket.emit('moonPosition', moonPosition);
+            socket.emit('sunPosition', sunPosition);
+            socket.emit('earthPosition', earthPosition);
+            socket.emit('moonPosition', moonPosition);
 
-        // rotations
-        // Get the rotation matrix from the origin's frame to the Body frame.
-        var earthLocalRotation = spice.pxform('IAU_EARTH', ref, et);
-        var earthTotalRotation = spice.mxm(earthLocalRotation, spherePreRotation);
-        earthTotalRotation = spice.mxm(sceneRotation, earthTotalRotation);
+            // rotations
+            // Get the rotation matrix from the origin's frame to the Body frame.
+            var earthLocalRotation = spice.pxform('IAU_EARTH', ref, et);
+            var earthTotalRotation = spice.mxm(earthLocalRotation, spherePreRotation);
+            earthTotalRotation = spice.mxm(sceneRotation, earthTotalRotation);
 
-        var moonLocalRotation = spice.pxform('IAU_MOON', ref, et);
-        var moonTotalRotation = spice.mxm(moonLocalRotation, spherePreRotation);
-        moonTotalRotation = spice.mxm(sceneRotation, moonTotalRotation);
+            var moonLocalRotation = spice.pxform('IAU_MOON', ref, et);
+            var moonTotalRotation = spice.mxm(moonLocalRotation, spherePreRotation);
+            moonTotalRotation = spice.mxm(sceneRotation, moonTotalRotation);
 
-        var sunLocalRotation = spice.pxform('IAU_SUN', ref, et);
-        var sunTotalRotation = spice.mxm(sunLocalRotation, spherePreRotation);
-        sunTotalRotation = spice.mxm(sceneRotation, sunTotalRotation);
-        
-        socket.emit('earthQuat', spice.m2q(earthTotalRotation));
-        socket.emit('moonQuat', spice.m2q(moonTotalRotation));
-        socket.emit('sunQuat', spice.m2q(sunTotalRotation));
+            var sunLocalRotation = spice.pxform('IAU_SUN', ref, et);
+            var sunTotalRotation = spice.mxm(sunLocalRotation, spherePreRotation);
+            sunTotalRotation = spice.mxm(sceneRotation, sunTotalRotation);
+            
+            socket.emit('earthQuat', spice.m2q(earthTotalRotation));
+            socket.emit('moonQuat', spice.m2q(moonTotalRotation));
+            socket.emit('sunQuat', spice.m2q(sunTotalRotation));
 
-        socket.emit('dateTime', spice.et2utc(et, "C", 0) + " (UTC)");
+            socket.emit('dateTime', spice.et2utc(et, "C", 0) + " (UTC)");
+        }
+        catch(error){
+            console.error(error);
+        }
     }, 1000);
 
     socket.on('triggerNowAction', () => {
