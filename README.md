@@ -19,10 +19,10 @@ Adding the js-spice module to a host application using Git submodules involves a
 
 #### 2 Add the Module as a Submodule:
 * Navigate to the root directory of your host application.
-* Use the command `git submodule add <repository URL of your module>` to add your module as a submodule. Replace `<repository URL of your module>` with the actual URL of the js-spice Git repository.
+* Use the command `git submodule add https://github.com/gamergenic/js-spice.git` to add your module as a submodule.
 
 ##### 3 Specify the Path for the Submodule:
-* While adding the submodule, you can also specify a path where you want the submodule to be placed. For instance: `git submodule add <repository URL> <desired path>`.
+* While adding the submodule, you can also specify a path where you want the submodule to be placed. For instance: `git submodule add https://github.com/gamergenic/js-spice.git <desired path>`.
 * If you don't specify a path, the submodule will be placed in a directory with the same name as the repository by default.
 
 #### 4 Initialize and Update the Submodule:
@@ -44,6 +44,12 @@ Adding the js-spice module to a host application using Git submodules involves a
 * After committing the changes, push them to the host application repository with `git push`.
 Remember, each submodule is essentially a separate Git repository, so you need to commit and push changes within each submodule separately, as well as in the host repository.
 
+#### 9 Updating the js-spice module to latest from your host app:
+```sh
+cd modules/js-spice
+git pull origin main
+npm install
+```
 
 ### License
 MIT License.
