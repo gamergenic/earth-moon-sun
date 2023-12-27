@@ -12,9 +12,9 @@ document.body.appendChild(renderer.domElement);
 
 // Texture loader
 const textureLoader = new THREE.TextureLoader();
-const earthTexture = textureLoader.load('8k_earth_daymap.jpg');
-const moonTexture = textureLoader.load('8k_moon.jpg');
-const sunTexture = textureLoader.load('8k_sun.jpg');
+const earthTexture = textureLoader.load('https://gamedevtricks.com/images/earth-moon-sun/8k_earth_daymap.jpg');
+const moonTexture = textureLoader.load('https://gamedevtricks.com/images/earth-moon-sun/8k_moon.jpg');
+const sunTexture = textureLoader.load('https://gamedevtricks.com/images/earth-moon-sun/8k_sun.jpg');
 
 // Geometry for a sphere
 const earthGeometry = new THREE.SphereGeometry(1, 128, 128);
