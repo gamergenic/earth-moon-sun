@@ -45,6 +45,10 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Color and i
 directionalLight.position.set(500000000000000, 300, 500); // Position of the light
 scene.add(directionalLight);
 
+// Ambient light (makes the scene more useable)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.025); // Soft white light
+scene.add(ambientLight);
+
 camera.position.z = 5;
 
 // Orbit Controls
@@ -128,7 +132,7 @@ document.getElementById('serverEarthButton').addEventListener('click', () => {
 document.getElementById('serverMoonButton').addEventListener('click', () => {
     socket.emit('triggerMoonAction');
     controls.target = moonSphere.position;
-    controls.minDistance = 2;
+    controls.minDistance = 1;
 });
 
 document.getElementById('serverSunButton').addEventListener('click', () => {
