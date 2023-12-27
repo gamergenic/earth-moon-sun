@@ -2,6 +2,9 @@
 
 Example node.js server that makes use of js-spice javascript wrapper for the NASA SPICE library.
 
+Server can be viewed here:
+https://earth-moon-sun.gamedevtricks.com/
+
 ## Features
 
 This example includes the js-spice module as a git submodule, since the package is not available
