@@ -1,0 +1,3 @@
+[submodule "modules/js-spice"]
+	path = modules/js-spice
+	url = https://git-codecommit.us-west-1.amazonaws.com/v1/repos/js-spice
