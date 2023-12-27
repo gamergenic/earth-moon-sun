@@ -19,17 +19,19 @@ let rotationY = 0; // Initialize rotationY
 
 io.on('connection', (socket) => {
 //    console.log('A user connected');
-    let moonScale = spice.bodvrd('moon', 'RADII');
-    let earthScale = spice.bodvrd('earth', 'RADII');
-    let sunScale = spice.bodvrd('sun', 'RADII');
-    let scaleDivisor = earthScale[0];
+    const moonScale = spice.bodvrd('moon', 'RADII');
+    const earthScale = spice.bodvrd('earth', 'RADII');
+    const sunScale = spice.bodvrd('sun', 'RADII');
+    const scaleDivisor = earthScale[0];
     socket.emit('moonScale', moonScale[0]/scaleDivisor);
     socket.emit('earthScale', earthScale[0]/scaleDivisor);
     socket.emit('sunScale', sunScale[0]/scaleDivisor);
 
-    const ref = 'ECLIPJ2000';
+    var ref = 'ECLIPJ2000';
+//    const ref = 'IAU_MOON';
     const abcorr = 'NONE';
-    const obs = 'EARTH_BARYCENTER';
+    var obs = 'EARTH_BARYCENTER';
+//    const obs = 'MOON';
     const sceneRotation = spice.rotate(spice.halfpi(), 1);
     const spherePreRotation = spice.eul2m(-spice.halfpi(), 0, 0, 1, 2, 3);
 
@@ -37,12 +39,14 @@ io.on('connection', (socket) => {
     var earthPos;
     var sunPos;
     var et = et_now();
+    var et_offset = 0;
 
     // Emit sphere rotation value every second
     const intervalId = setInterval(() => {
     
         // et = et_now();
-        et += spice.spd()/1200;
+        // et += spice.spd()/1200;
+        et = et_now() + et_offset;
 
         // positions
         sunPos = spice.spkpos('sun', et, ref, abcorr, obs).ptarg;
@@ -66,12 +70,49 @@ io.on('connection', (socket) => {
         var earthLocalRotation = spice.pxform('IAU_EARTH', ref, et);
         var earthTotalRotation = spice.mxm(earthLocalRotation, spherePreRotation);
         earthTotalRotation = spice.mxm(sceneRotation, earthTotalRotation);
-      
-        socket.emit('earthQuat', spice.m2q(earthTotalRotation));
-        socket.emit('moonQuat', spice.m2q(spice.mxm(sceneRotation, spice.pxform('IAU_MOON', ref, et))));
-        socket.emit('sunQuat', spice.m2q(spice.mxm(sceneRotation, spice.pxform('IAU_SUN', ref, et))));
 
-    }, 20);
+        var moonLocalRotation = spice.pxform('IAU_MOON', ref, et);
+        var moonTotalRotation = spice.mxm(moonLocalRotation, spherePreRotation);
+        moonTotalRotation = spice.mxm(sceneRotation, moonTotalRotation);
+
+        var sunLocalRotation = spice.pxform('IAU_SUN', ref, et);
+        var sunTotalRotation = spice.mxm(sunLocalRotation, spherePreRotation);
+        sunTotalRotation = spice.mxm(sceneRotation, sunTotalRotation);
+        
+        socket.emit('earthQuat', spice.m2q(earthTotalRotation));
+        socket.emit('moonQuat', spice.m2q(moonTotalRotation));
+        socket.emit('sunQuat', spice.m2q(sunTotalRotation));
+
+        socket.emit('dateTime', spice.et2utc(et, "C", 0) + " (UTC)");
+    }, 1000);
+
+    socket.on('triggerNowAction', () => {
+        et_offset = 0;
+    });
+
+    socket.on('triggerHourAction', () => {
+        et_offset += spice.spd() / 24;        
+    });
+
+    socket.on('triggerDayAction', () => {
+        et_offset += spice.spd();        
+    });
+
+
+    socket.on('triggerEarthAction', () => {
+        ref = 'ECLIPJ2000';
+        obs = 'EARTH_BARYCENTER';
+    });
+
+    socket.on('triggerMoonAction', () => {
+        ref = 'IAU_MOON';
+        obs = 'MOON';
+    });
+
+    socket.on('triggerSunAction', () => {
+        ref = 'ECLIPJ2000';
+        obs = 'SSB';
+    });    
 
     socket.on('disconnect', () => {
 //        console.log('A user disconnected');

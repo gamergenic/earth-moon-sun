@@ -1,9 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Earth-Moon-Sun</title>
+  <title>Earth, Moon, Sun</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: #000000;
+    }
+    #title {
+      color: #999;
+      margin: 20px;
+    }
+    #myCanvas {
+      display: block;
+      margin: auto;
+      background-color: #000;
+    }
+    #dateTimeDisplay {
+      color: #555;
+      margin: 20px;
+    }
+  </style>
 </head>
 <body>
+  <h1 id="title">Earth, Moon, Sun</h1>
+  <div id="dateTimeDisplay"></div>
+  <button id="serverNowButton">Now</button>
+  <button id="serverHourButton">+Hour</button>
+  <button id="serverDayButton">+Day</button><br>
+  <button id="serverEarthButton">Earth</button>
+  <button id="serverMoonButton">Moon</button>
+  <button id="serverSunButton">Sun</button>
   <canvas id="myCanvas"></canvas>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.142.0/build/three.min.js"></script>
