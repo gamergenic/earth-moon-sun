@@ -1,3 +1,4 @@
+// This is an example node.js server that uses js-spice wrapper around NASA's SPICE library.
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -15,10 +16,7 @@ const moonScale = 0.5;
 const earthScale = 1.0;
 const sunScale = 2.0;
 
-let rotationY = 0; // Initialize rotationY
-
 io.on('connection', (socket) => {
-//    console.log('A user connected');
     const moonScale = spice.bodvrd('moon', 'RADII');
     const earthScale = spice.bodvrd('earth', 'RADII');
     const sunScale = spice.bodvrd('sun', 'RADII');
@@ -28,10 +26,8 @@ io.on('connection', (socket) => {
     socket.emit('sunScale', sunScale[0]/scaleDivisor);
 
     var ref = 'ECLIPJ2000';
-//    const ref = 'IAU_MOON';
     const abcorr = 'NONE';
     var obs = 'EARTH_BARYCENTER';
-//    const obs = 'MOON';
     const sceneRotation = spice.rotate(spice.halfpi(), 1);
     const spherePreRotation = spice.eul2m(-spice.halfpi(), 0, 0, 1, 2, 3);
 
@@ -45,8 +41,6 @@ io.on('connection', (socket) => {
     const intervalId = setInterval(() => {
     
         try {
-            // et = et_now();
-            // et += spice.spd()/1200;
             et = et_now() + et_offset;
 
             // positions
@@ -120,7 +114,6 @@ io.on('connection', (socket) => {
     });    
 
     socket.on('disconnect', () => {
-//        console.log('A user disconnected');
         clearInterval(intervalId);
     });
 });
