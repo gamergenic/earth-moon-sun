@@ -2,7 +2,7 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const {spice, genericKernels, et_now} = require('./modules/js-spice');
+const { spice, getKernels, et_now } = require('@gamergenic/js-spice');
 
 const app = express();
 const server = http.createServer(app);
@@ -124,31 +124,14 @@ server.listen(port, () => {
 });
 
 
+const kernelsToLoad = [
+    'lsk/latest_leapseconds.tls',
+    'pck/pck00011.tpc',
+    'pck/gm_de440.tpc',
+    'spk/planets/de440.bsp',
+    'spk/stations/earthstns_itrf93_201023.bsp',
+    'fk/stations/earth_topo_201023.tf',
+    'pck/earth_200101_990825_predict.bpc'
+];
 
-async function getKernels() {
-
-    const kernelsToLoad = [
-        'lsk/latest_leapseconds.tls',
-        'pck/pck00011.tpc',
-        'pck/gm_de440.tpc',
-        'spk/planets/de440.bsp',
-        'spk/stations/earthstns_itrf93_201023.bsp',
-        'fk/stations/earth_topo_201023.tf',
-        'pck/earth_200101_990825_predict.bpc'
-    ];
-
-
-    async function loadAndProcessFiles(files) {
-        const operations = files.map(file => {
-            return genericKernels.getGenericKernel(file, `data/naif/generic_kernels/${file}`).then(kernel => {
-                spice.furnsh(kernel);
-            });
-        });
-    
-        await Promise.all(operations);
-        console.log("done loading kernels");
-    }
-    await loadAndProcessFiles(kernelsToLoad);
-}
-
-getKernels();
+getKernels(kernelsToLoad);
